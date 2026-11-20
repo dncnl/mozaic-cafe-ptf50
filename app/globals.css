@@ -1,0 +1,564 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   mozaic design tokens — derived from the business's real pubmats and the
+   owner's brand style sheet, not from a generic UI kit.
+
+   Evidence notes are kept inline deliberately: the previous system was a guess
+   made before any pubmats were available, and the point of this pass is that
+   every value below traces back to something real.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Sampled off the cafe/kitchen/bar artboards with sharp. All three agree to
+     within 2/255 (rgb(58,101,187)) — these are flat vector fills, so this is
+     the most reliable colour reading available, not an eyeball estimate.
+     Supersedes the #3f66c8 read off a PDF rendering. */
+  --moz-blue: #3866bb;
+
+  /* Blue IS the text colour on light grounds — no navy or grey ramp.
+     --moz-ink is the same hue, deepened for small text (8.6:1 on white,
+     7.3:1 on cream; --moz-blue itself is 5.54:1 on white, 4.7:1 on cream). */
+  --moz-ink: #24479a;
+
+  --moz-white: #ffffff;
+
+  /* Warm off-white (Nov 2026 art-direction brief): breaks up large areas of
+     saturated blue. Editorial sections sit on it; white stays for cards. */
+  --moz-cream: #f1ede3;
+
+  /* Line weight for every outline in the system. */
+  --moz-line: 2px;
+
+  --background: var(--moz-white);
+  --foreground: var(--moz-ink);
+
+  /* Few radii: cards/panels/images (lg), small controls (sm). Buttons are
+     full pills. Flat: outlines, never blurred shadows. */
+  --moz-radius-sm: 0.75rem;
+  --moz-radius: 1rem;
+  --moz-radius-lg: 1.25rem;
+
+  --moz-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* iOS sheet/thumb curve — fast out, long settle. Used for UI that answers a
+     tap (segmented thumb, press states), never for decorative entrances. */
+  --moz-ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Dashed row rules inside groups, and the pressed-row fill. */
+  --moz-hairline: color-mix(in srgb, var(--moz-blue) 35%, transparent);
+  --moz-fill: color-mix(in srgb, var(--moz-blue) 10%, transparent); /* pressed rows */
+  --moz-radius-group: 1.25rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-moz-blue: var(--moz-blue);
+  --color-moz-ink: var(--moz-ink);
+  --color-moz-white: var(--moz-white);
+  --color-moz-cream: var(--moz-cream);
+
+  /* Real platform brand colors — used only on the buttons that lead to those
+     platforms, never elsewhere. Validated by the pubmats; unchanged. */
+  --color-brand-facebook: #1877f2;
+  --color-brand-tiktok: #000000;
+  --color-brand-foodpanda: #d70f64;
+  --color-brand-grabfood: #00b14f;
+  --color-brand-whatsapp: #25d366;
+  --color-brand-messenger: #0084ff;
+
+  /* Google's review-star gold — star ratings only, per the universal review
+     convention. Not part of the brand palette. */
+  --color-star: #fbbc04;
+
+  --radius-moz-sm: var(--moz-radius-sm);
+  --radius-moz: var(--moz-radius);
+  --radius-moz-lg: var(--moz-radius-lg);
+
+  /* Style sheet: headers and sub-headers at -5%, body at 0. The stock
+     `tracking-tight` is -2.5% — right direction, half the value. */
+  --tracking-moz: -0.05em;
+
+  --font-sans: var(--font-poppins);
+  --font-display: var(--font-league-spartan);
+}
+
+/* ---------------------------------------------------------------------------
+   Type scale (Nov 2026 brief: display / body / utility, two families).
+   @utility so these live in the utilities layer and responsive utilities on
+   the element can still override them.
+     display  League Spartan 800, lowercase, -0.05em  — hero + page titles
+     h2 / h3  League Spartan 800 / 700, lowercase     — section + card titles
+     body     Poppins 400                             — everything readable
+     label    .moz-micro, League Spartan 600 caps     — eyebrows, tags, meta
+   No italics, no wide letter-spacing, no uppercase except the label.
+   --------------------------------------------------------------------------- */
+
+@utility moz-display {
+  font-family: var(--font-league-spartan), sans-serif;
+  font-weight: 800;
+  text-transform: lowercase;
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+  font-size: clamp(3rem, 1.9rem + 4.6vw, 6.25rem);
+  text-wrap: balance;
+}
+
+@utility moz-h2 {
+  font-family: var(--font-league-spartan), sans-serif;
+  font-weight: 800;
+  text-transform: lowercase;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  font-size: clamp(2.25rem, 1.7rem + 2.2vw, 3.75rem);
+  text-wrap: balance;
+}
+
+@utility moz-h3 {
+  font-family: var(--font-league-spartan), sans-serif;
+  font-weight: 700;
+  text-transform: lowercase;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2rem);
+}
+
+/* Buttons: one height (48px), one shape (pill), four colourways. Pair with
+   .moz-btn for the press feedback. */
+@utility moz-btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding-inline: 1.5rem;
+  border: var(--moz-line) solid transparent;
+  font-family: var(--font-league-spartan), sans-serif;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* On light grounds */
+@utility moz-btn-solid {
+  background-color: var(--moz-blue);
+  border-color: var(--moz-blue);
+  color: var(--moz-white);
+}
+
+@utility moz-btn-line {
+  background-color: transparent;
+  border-color: var(--moz-blue);
+  color: var(--moz-blue);
+  &:hover {
+    background-color: var(--moz-blue);
+    color: var(--moz-white);
+  }
+}
+
+/* On blue grounds */
+@utility moz-btn-white {
+  background-color: var(--moz-white);
+  border-color: var(--moz-white);
+  color: var(--moz-blue);
+}
+
+@utility moz-btn-white-line {
+  background-color: transparent;
+  border-color: var(--moz-white);
+  color: var(--moz-white);
+  &:hover {
+    background-color: var(--moz-white);
+    color: var(--moz-blue);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Primitives.
+
+   NOTE: everything below is UNLAYERED css, while Tailwind's utilities live in
+   @layer utilities — unlayered always wins regardless of specificity. So every
+   state override (:hover, :active, :focus-visible) must be written here next
+   to its base class, never as a Tailwind variant on the element. This is what
+   broke the marquee's pause-on-hover during the original build.
+   --------------------------------------------------------------------------- */
+
+/* Film grain. The recurring background texture across the pubmats is grain /
+   spray / hatch — never a dot lattice (dots appear once, as shading *inside*
+   an illustration, not as a field wash). data: URI is already permitted by the
+   CSP's img-src. */
+.moz-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--moz-grain-opacity, 0.12);
+  mix-blend-mode: var(--moz-grain-blend, overlay);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* Brand-blue ground — hero, menu/match headers, reviews band. */
+.moz-field {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--moz-blue);
+  color: var(--moz-white);
+}
+
+/* Outlined white panel — flat, blue line, no shadow. */
+.moz-panel-line {
+  background: var(--moz-white);
+  border: var(--moz-line) solid var(--moz-blue);
+  border-radius: var(--moz-radius-lg);
+}
+
+/* ---------------------------------------------------------------------------
+   Blue sticker system (Nov 2026) — mood boards 1 (Woofers) + 2 (Times Bakery),
+   grounded in mozaic's own pubmats: thick white line art on flat blue.
+   --------------------------------------------------------------------------- */
+
+/* Solid blue panel — the Times Bakery bento tile. Flat, generous radius. */
+.moz-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--moz-blue);
+  color: var(--moz-white);
+  border-radius: var(--moz-radius-lg);
+}
+
+/* Warm off-white editorial ground. Flat — the crumple texture is retired. */
+.moz-paper {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--moz-cream);
+}
+
+/* Ticket / coupon: half-circle notches bitten out of both long sides
+   (mood board 2's coupon). The mask leaves the notches transparent, so the
+   ground shows through whatever the ticket sits on. */
+.moz-ticket {
+  --moz-notch: 11px;
+  --moz-notch-at: 50%;
+  border-radius: var(--moz-radius);
+  -webkit-mask:
+    radial-gradient(circle var(--moz-notch) at 0 var(--moz-notch-at), transparent 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--moz-notch) at 100% var(--moz-notch-at), transparent 98%, #000) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle var(--moz-notch) at 0 var(--moz-notch-at), transparent 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--moz-notch) at 100% var(--moz-notch-at), transparent 98%, #000) right / 51% 100% no-repeat;
+}
+
+/* Perforation between a ticket's stub and body. */
+.moz-perf {
+  border-top: var(--moz-line) dashed currentColor;
+  opacity: 0.55;
+}
+
+/* Utility label: the third type role, for eyebrows, tags and meta
+   ("Business hours", "4 items"). The ONLY uppercase in the system. */
+.moz-micro {
+  font-family: var(--font-league-spartan), sans-serif;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* Dashed blue rule — menu rows, ticket lists. */
+.moz-dash {
+  border-top: 2px dashed var(--moz-hairline);
+}
+
+/* Apple-style press feedback: buttons don't float up on hover, they brighten
+   slightly and compress under the finger. Works the same on touch, where the
+   old hover-lift never fired at all. */
+.moz-btn {
+  border-radius: 9999px;
+  transition: transform 220ms var(--moz-ease-ios), filter 180ms var(--moz-ease),
+    background-color 180ms var(--moz-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.moz-btn:hover {
+  filter: brightness(1.08);
+}
+
+.moz-btn:active {
+  transform: scale(0.97);
+  filter: brightness(0.96);
+}
+
+/* ---------------------------------------------------------------------------
+   Structure: solid bars, segmented control, grouped lists (sticker re-skin).
+   --------------------------------------------------------------------------- */
+
+/* Solid white bar (navbar, tab bar) — the frosted night glass is retired.
+   Class name kept so callers don't churn; it is now opaque white + blue. */
+.moz-glass,
+.moz-glass-light {
+  background-color: var(--moz-white);
+  color: var(--moz-blue);
+}
+
+/* Segmented control. The thumb is one element translated by --moz-seg-index,
+   so switching tabs slides it rather than repainting a new pill — the motion
+   shows what changed. --moz-seg-count sets its width.
+   Sticker re-skin: blue outlined track, solid blue thumb, white active label. */
+.moz-segmented {
+  position: relative;
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  background: var(--moz-white);
+  border: var(--moz-line) solid var(--moz-blue);
+}
+
+.moz-segmented-thumb {
+  position: absolute;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  width: calc((100% - 0.5rem) / var(--moz-seg-count, 3));
+  border-radius: 9999px;
+  background: var(--moz-blue);
+  transform: translateX(calc(100% * var(--moz-seg-index, 0)));
+  transition: transform 380ms var(--moz-ease-ios);
+}
+
+/* Grouped list: one outlined white panel per group, rows split by dashed
+   blue rules. No per-row cards. */
+.moz-group {
+  background: var(--moz-white);
+  border: var(--moz-line) solid var(--moz-blue);
+  border-radius: var(--moz-radius-group);
+  overflow: hidden;
+}
+
+.moz-group-row {
+  position: relative;
+  padding: 0.875rem 1.125rem;
+}
+
+.moz-group-row + .moz-group-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1.125rem;
+  right: 1.125rem;
+  height: 0;
+  border-top: 2px dashed var(--moz-hairline);
+}
+
+/* Tappable rows get the iOS pressed fill, not a hover animation.
+   No `display` here on purpose: this rule is unlayered, so it would beat the
+   `flex` utility every tappable row uses (the CSS-layering gotcha in
+   CLAUDE.md). Layout belongs to utilities on the element. */
+a.moz-group-row,
+button.moz-group-row {
+  width: 100%;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 160ms var(--moz-ease);
+}
+
+a.moz-group-row:hover,
+button.moz-group-row:hover {
+  background: color-mix(in srgb, var(--moz-blue) 4%, transparent);
+}
+
+a.moz-group-row:active,
+button.moz-group-row:active {
+  background: var(--moz-fill);
+}
+
+/* Surfaces don't move on hover; they brighten, like buttons. */
+.moz-lift {
+  transition: filter 180ms var(--moz-ease);
+}
+
+.moz-lift:hover {
+  filter: brightness(1.06);
+}
+
+/* Duotone photo treatment — the filter is defined as an inline <svg> in
+   components/BrandFilters.tsx, so no data: URI or CSP change is involved. */
+.moz-duotone {
+  filter: url(#moz-duotone);
+}
+
+/* Official Instagram gradient — used only on the Instagram button. */
+.bg-instagram-gradient {
+  background: radial-gradient(
+    circle at 30% 107%,
+    #fdf497 0%,
+    #fdf497 5%,
+    #fd5949 45%,
+    #d6249f 60%,
+    #285aeb 90%
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   Composition pieces
+   --------------------------------------------------------------------------- */
+
+/* Category poster tile. The artboards are 1600x2263 (1:root-2 portrait) with
+   the wordmark at the top and the illustration bleeding off the bottom, so
+   they must never be cropped to a wide box — the aspect ratio is pinned to
+   their native shape and the art scales inside it on hover. */
+.moz-poster {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--moz-radius);
+  background-color: var(--moz-blue);
+}
+
+/* ---------------------------------------------------------------------------
+   Focus
+   --------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 3px solid var(--moz-blue);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.moz-field :focus-visible,
+.moz-panel :focus-visible,
+.moz-ticket :focus-visible,
+.moz-poster:focus-visible {
+  outline-color: var(--moz-white);
+}
+
+.moz-skip-link {
+  position: absolute;
+  left: 50%;
+  top: 0.5rem;
+  z-index: 50;
+  transform: translate(-50%, -150%);
+  background: var(--moz-white);
+  color: var(--moz-blue);
+  border: var(--moz-line) solid var(--moz-blue);
+  border-radius: 9999px;
+  padding: 0.625rem 1.25rem;
+  transition: transform 160ms var(--moz-ease);
+}
+
+.moz-skip-link:focus-visible {
+  transform: translate(-50%, 0);
+}
+
+/* ---------------------------------------------------------------------------
+   Motion
+
+   Budget goes to one orchestrated page load plus scroll reveals, rather than
+   scattered micro-interactions. Everything is neutralised under
+   prefers-reduced-motion at the bottom of this file.
+   --------------------------------------------------------------------------- */
+
+@keyframes moz-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Page-load stagger, pure CSS — no JS, no hydration cost. Direct children
+   enter in document order. `backwards` holds the from-state during the delay
+   so nothing flashes at full opacity first. */
+.moz-enter > * {
+  animation: moz-rise 800ms var(--moz-ease) backwards;
+}
+
+.moz-enter > *:nth-child(1) {
+  animation-delay: 80ms;
+}
+.moz-enter > *:nth-child(2) {
+  animation-delay: 170ms;
+}
+.moz-enter > *:nth-child(3) {
+  animation-delay: 260ms;
+}
+.moz-enter > *:nth-child(4) {
+  animation-delay: 350ms;
+}
+.moz-enter > *:nth-child(5) {
+  animation-delay: 440ms;
+}
+.moz-enter > *:nth-child(6) {
+  animation-delay: 530ms;
+}
+
+/* Scroll reveal. Toggled by components/Reveal.tsx via IntersectionObserver —
+   `animation-timeline: view()` would be neater but Safari and Firefox still
+   don't ship it. --moz-delay lets grids stagger their children. */
+.moz-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 700ms var(--moz-ease), transform 700ms var(--moz-ease);
+  transition-delay: var(--moz-delay, 0ms);
+}
+
+.moz-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Review marquee: the track renders its card list twice back to back and
+   scrolls exactly half its own width, so the loop is seamless. */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+/* Plain hover rule, not a Tailwind hover:[...] utility — see the layering note
+   at the top of the primitives block. */
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+
+  /* Render the final state immediately rather than merely shortening things. */
+  .moz-enter > * {
+    animation: none;
+  }
+
+  .moz-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .moz-btn,
+  .moz-lift,
+  .moz-skip-link,
+  .moz-segmented-thumb {
+    transition: none;
+  }
+
+  .moz-btn:active {
+    transform: none;
+  }
+
+}
